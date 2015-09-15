@@ -15,5 +15,16 @@
         i18n:attributes="title">
             <permission>collective.login_monitor: View logins</permission>
     </configlet>
+    <configlet
+        title="Login Monitor Settings"
+        action_id="login_monitor.settings"
+        appId="collective.login_monitor_settings"
+        category="Products"
+        condition_expr=""
+        url_expr="string:${portal_url}/portal_registry?q=&amp;qp=prefix%3Acollective.login_monitor.interfaces.IRegistry"
+        visible="True"
+        i18n:attributes="title">
+            <permission>Manage portal</permission>
+    </configlet>
 
 </object>

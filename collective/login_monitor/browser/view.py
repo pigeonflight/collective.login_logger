@@ -9,6 +9,7 @@ from collective.login_monitor import Session
 from collective.login_monitor import messageFactory as _
 from collective.login_monitor.models import LoginRecord
 from datetime import date, datetime, timedelta
+from plone import api
 from plone.memoize.view import memoize
 from sqlalchemy import and_, not_
 from sqlalchemy import func, distinct
@@ -19,6 +20,8 @@ from zope.component.interfaces import ComponentLookupError
 class UsersLoginMonitorView(BrowserView):
     
     ignored_groups = ('Administrators', 'Reviewers', 'AuthenticatedUsers', 'Site Administrators')
+    group_whitelist = api.portal.get_registry_record(
+               'collective.login_monitor.group_whitelist')
     
     def __init__(self, context, request):
         self.context = context
@@ -153,6 +156,21 @@ class UsersLoginMonitorView(BrowserView):
         for group in pas.searchGroups():
             if not group['id'] in self.ignored_groups:
                 yield group
+                
+    @property
+    def groups_whitelist(self):
+        '''
+        Returns the groups of this site for filling the select in the form
+        
+        To add sample users do something like that
+        [pas.userFolderAddUser(str(x).zfill(8), str(x).zfill(8), 
+        ('Member',), (), ('Test 1',),) for x in range(4)]
+        '''
+        pas = getToolByName(self.context, 'acl_users')
+        for group in self.groups:
+            if group['id'] in self.group_whitelist:
+                yield group
+            
 
     def _load_exclude_users(self, site_id):
         """Load user ids from login in the range. Used for performing negative logic"""

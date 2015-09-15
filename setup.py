@@ -33,6 +33,7 @@ setup(name='collective.login_monitor',
           'SQLAlchemy',
           'collective.js.jqueryui',
           'z3c.saconfig',
+          'plone.api',
       ],
       entry_points="""
       [z3c.autoinclude.plugin]
