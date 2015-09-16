@@ -239,7 +239,8 @@ class UsersLoginMonitorView(BrowserView):
             {"query":query,"lodate":self._start,"hidate":self._end})
             print results
         else:
-            results = Session.execute('select now(), generate_series(1,10)')
+            results = Session.execute('select user_id,count(user_id),max(timestamp)  from logins_registry where user_id !~* :query and timestamp > :lodate and timestamp < :hidate group by user_id;',
+            {"query":query,"lodate":self._start,"hidate":self._end})
             print results
         return self._get_results(results)
 
