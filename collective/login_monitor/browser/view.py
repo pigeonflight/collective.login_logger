@@ -20,9 +20,12 @@ from zope.component.interfaces import ComponentLookupError
 class UsersLoginMonitorView(BrowserView):
     
     ignored_groups = ('Administrators', 'Reviewers', 'AuthenticatedUsers', 'Site Administrators')
-    group_whitelist = api.portal.get_registry_record(
+    try:
+        group_whitelist = api.portal.get_registry_record(
                'collective.login_monitor.group_whitelist')
-    
+    except ComponentLookupError:
+        group_whitelist = False
+        
     def __init__(self, context, request):
         self.context = context
         self.request = request
@@ -167,10 +170,10 @@ class UsersLoginMonitorView(BrowserView):
         ('Member',), (), ('Test 1',),) for x in range(4)]
         '''
         pas = getToolByName(self.context, 'acl_users')
-        for group in self.groups:
-            if group['id'] in self.group_whitelist:
-                yield group
-            
+        if group_whitelist:
+            for group in self.groups:
+                if group['id'] in self.group_whitelist:
+                    yield group
 
     def _load_exclude_users(self, site_id):
         """Load user ids from login in the range. Used for performing negative logic"""
@@ -185,80 +188,83 @@ class UsersLoginMonitorView(BrowserView):
 
     def _get_results(self, results):
         acl_users = getToolByName(self.context, 'acl_users')
-        self.last_query_size = len(results)
+        #self.last_query_size = len(results)
+        self.last_query_size = 1  # hardcoded. using session.execute returns a resultproxy object which has no len
+        
 
         processed = []
         for row in results:
-            result = {'user_id': row.user_id,
+            result = {'user_id': row[0],
                       'login_count': row[1],
                       'user_fullname': None,
                       'user_email': None,
                       'last_login_date': row[2]}
             # unluckily searchUsers is not returnig the email address
             #user = acl_users.searchUsers(login=row.user_id, exact_match=True)
-            user = acl_users.getUserById(row.user_id)
+            
+            user = acl_users.getUserById(row[0])
+            
             if user:
                 result['user_fullname'] = user.getProperty('fullname')
                 result['user_email'] = user.getProperty('email')
             processed.append(result)
         return processed
 
+    # def _query_users(self, query, site_id):
+    #     exclude_ids = self._load_exclude_users(site_id)
+    #     if not exclude_ids:
+    #         results = Session.query(LoginRecord.user_id, func.count(LoginRecord.user_id),
+    #                                 func.max(LoginRecord.timestamp)) \
+    #                 .filter(and_(LoginRecord.user_id.startswith(query),
+    #                              LoginRecord.plone_site_id==site_id,
+    #                              LoginRecord.timestamp>=self._start,
+    #                              LoginRecord.timestamp<=self._end)) \
+    #                 .group_by(LoginRecord.user_id,
+    #                           LoginRecord.plone_site_id).order_by(LoginRecord.user_id).all()
+    #     else:
+    #         results = Session.query(LoginRecord.user_id, func.count(LoginRecord.user_id),
+    #                                 func.max(LoginRecord.timestamp)) \
+    #                 .filter(and_(LoginRecord.user_id.startswith(query),
+    #                              LoginRecord.plone_site_id==site_id,
+    #                              not_(LoginRecord.user_id.in_(exclude_ids)))) \
+    #                 .group_by(LoginRecord.user_id,
+    #                           LoginRecord.plone_site_id).order_by(LoginRecord.user_id).all()
+    #     return self._get_results(results)
+    
     def _query_users(self, query, site_id):
         exclude_ids = self._load_exclude_users(site_id)
         if not exclude_ids:
-            results = Session.query(LoginRecord.user_id, func.count(LoginRecord.user_id),
-                                    func.max(LoginRecord.timestamp)) \
-                    .filter(and_(LoginRecord.user_id.startswith(query),
-                                 LoginRecord.plone_site_id==site_id,
-                                 LoginRecord.timestamp>=self._start,
-                                 LoginRecord.timestamp<=self._end)) \
-                    .group_by(LoginRecord.user_id,
-                              LoginRecord.plone_site_id).order_by(LoginRecord.user_id).all()
+            print 'element::::' + query +'::::' + str(self._end)
+            results = Session.execute('select user_id,count(user_id),max(timestamp)  from logins_registry where user_id ~* :query and timestamp > :lodate and timestamp < :hidate group by user_id;',
+            {"query":query,"lodate":self._start,"hidate":self._end})
+            print results
         else:
-            results = Session.query(LoginRecord.user_id, func.count(LoginRecord.user_id),
-                                    func.max(LoginRecord.timestamp)) \
-                    .filter(and_(LoginRecord.user_id.startswith(query),
-                                 LoginRecord.plone_site_id==site_id,
-                                 not_(LoginRecord.user_id.in_(exclude_ids)))) \
-                    .group_by(LoginRecord.user_id,
-                              LoginRecord.plone_site_id).order_by(LoginRecord.user_id).all()
+            results = Session.execute('select now(), generate_series(1,10)')
+            print results
         return self._get_results(results)
 
     def _load_users(self, user_ids, site_id):
         """Load data from all users in the set (commonly taken from groups member ids)"""
         exclude_ids = self._load_exclude_users(site_id)
         if not exclude_ids:
-            results = Session.query(LoginRecord.user_id, func.count(LoginRecord.user_id),
-                                    func.max(LoginRecord.timestamp)) \
-                    .filter(and_(LoginRecord.user_id.in_(user_ids),
-                                 LoginRecord.plone_site_id==site_id,
-                                 LoginRecord.timestamp>=self._start,
-                                 LoginRecord.timestamp<=self._end)) \
-                    .group_by(LoginRecord.user_id,
-                              LoginRecord.plone_site_id).order_by(LoginRecord.user_id).all()
+            results = Session.execute('select now(), generate_series(1,10)')
+            print results
         else:
-            results = Session.query(LoginRecord.user_id, func.count(LoginRecord.user_id),
-                                    func.max(LoginRecord.timestamp)) \
-                    .filter(and_(LoginRecord.user_id.in_(user_ids),
-                                 LoginRecord.plone_site_id==site_id,
-                                 not_(LoginRecord.user_id.in_(exclude_ids)))
-                                 ) \
-                    .group_by(LoginRecord.user_id,
-                              LoginRecord.plone_site_id).order_by(LoginRecord.user_id).all()
+            results = Session.execute('select now(), generate_series(1,10)')
+            print results
             import pdb;pdb.set_trace()
         return self._get_results(results)
 
     def _all_users(self, site_id):
         exclude_ids = self._load_exclude_users(site_id)
         if not exclude_ids:
-            results = Session.query(LoginRecord.user_id, func.count(LoginRecord.user_id),
-                                    func.max(LoginRecord.timestamp)) \
-                    .filter(LoginRecord.plone_site_id==site_id,
-                            LoginRecord.timestamp>=self._start,
-                            LoginRecord.timestamp<=self._end) \
-                    .group_by(LoginRecord.user_id,
-                              LoginRecord.plone_site_id).order_by(LoginRecord.user_id).all()
+            print 'pooooo'
+            results = Session.execute('select user_id,count(user_id),max(timestamp)  from logins_registry group by user_id;')
+            print results
+            # for qq in results:
+            #     print qq[0], qq[1], qq[2]
         else:
+            print 'pooooo2'
             results = Session.query(LoginRecord.user_id, func.count(LoginRecord.user_id),
                                     func.max(LoginRecord.timestamp)) \
                     .filter(LoginRecord.plone_site_id==site_id,
