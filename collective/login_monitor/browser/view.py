@@ -234,8 +234,8 @@ class UsersLoginMonitorView(BrowserView):
         qvars = {}
         
         if user_id:
-            qtext += ' where user_id ~* :user_id '
-            qvars['user_id'] = user_id
+            qtext += ' where user_id like :user_id '
+            qvars['user_id'] = '%'+user_id+'%'
         
         if datefilter:
             if 'where' in qtext:
