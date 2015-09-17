@@ -33,6 +33,7 @@ class UsersLoginLoggerView(BrowserView):
         self.last_query_size = 0
 
     def __call__(self, *args, **kwargs):
+        # import pdb;pdb.set_trace()
         self._form = kwargs or self.request.form
         if self._form.get('export'):
             self._exportCSV()
@@ -209,22 +210,6 @@ class UsersLoginLoggerView(BrowserView):
             processed.append(result)
         return processed
 
-   
-
-    def _load_users(self, user_ids, site_id):
-        """Load data from all users in the set (commonly taken from groups member ids)"""
-        exclude_ids = self._load_exclude_users(site_id)
-        if not exclude_ids:
-            results = Session.execute('select now(), generate_series(1,10)')
-            print results
-        else:
-            results = Session.execute('select now(), generate_series(1,10)')
-            print results
-            import pdb;pdb.set_trace()
-        return self._get_results(results)
-
-
-
     def _sole_query(self, site_id):
         exclude_ids = self._load_exclude_users(site_id)
         datefilter = self._form.get('datefilter', '')
@@ -248,10 +233,10 @@ class UsersLoginLoggerView(BrowserView):
             
         if group_id:
             if 'where' in qtext:
-                qtext += ' and group_id = :group_id '
+                qtext += ' and group_id like :group_id '
             else:
-                qtext += ' where group_id = :group_id '
-            qvars['group_id'] = group_id
+                qtext += ' where group_id like :group_id '
+            qvars['group_id'] = '%|'+group_id + '|%'
         
         qtext += ' group by user_id; '
         
@@ -272,8 +257,6 @@ class UsersLoginLoggerView(BrowserView):
         """Search results"""
         self._prepare_interval()
         portal = getToolByName(self.context, 'portal_url').getPortalObject()
-       # user_id = self._form.get('user_id', '')
-       # datefilter = self._form.get('datefilter', '')
         
         try:
            return self._sole_query(portal.getId())
