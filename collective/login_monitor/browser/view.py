@@ -229,6 +229,7 @@ class UsersLoginMonitorView(BrowserView):
         exclude_ids = self._load_exclude_users(site_id)
         datefilter = self._form.get('datefilter', '')
         user_id = self._form.get('user_id', '')
+        group_id = self._form.get('group_id', '')
         qtext = 'select user_id,count(user_id),max(timestamp)  from logins_registry '
         qvars = {}
         
@@ -244,6 +245,13 @@ class UsersLoginMonitorView(BrowserView):
             
             qvars['lodate'] = self._start
             qvars['hidate'] = self._end
+            
+        if group_id:
+            if 'where' in qtext:
+                qtext += ' and group_id = :group_id '
+            else:
+                qtext += ' where group_id = :group_id '
+            qvars['group_id'] = group_id
         
         qtext += ' group by user_id; '
         

@@ -43,7 +43,7 @@
                 
                     $("#start").datepicker({showOn: 'button', buttonImage: 'popup_calendar.png', buttonImageOnly: true, onSelect: updateDate, dateFormat: 'dd/mm/yy' });
                     $("#end").datepicker({showOn: 'button', buttonImage: 'popup_calendar.png', buttonImageOnly: true, onSelect: updateDate, dateFormat: 'dd/mm/yy'});
-                    // $("#datefilter").click(function(){$("#thisholder").show()});
+                    
                     $("#datefilter").click(function() { 
                         if ($("#datefilter").attr('checked')) {return $("#thisholder").show();
                           } else {
@@ -100,7 +100,7 @@
                        />
             </div>
             </div>
-            <div class="field">
+            <div class="field" style="display:none">
                 <input type="checkbox" id="exclude" name="exclude" value="exclude"
 				       tal:attributes="checked python:request.get('exclude')=='exclude'" />
                 <label for="exclude" i18n:translate="">Exclude</label>
