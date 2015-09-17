@@ -3,7 +3,7 @@
 from Products.CMFPlone.utils import getToolByName
 
 
-PROFILE_ID = 'profile-collective.login_monitor:default'
+PROFILE_ID = 'profile-collective.login_logger:default'
 
 
 def run_import_step(context, step):

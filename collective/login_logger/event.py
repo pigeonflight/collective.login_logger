@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
 from ZODB.POSException import ConflictError
-from collective.login_monitor import Session, logger
-from collective.login_monitor.models import User, LoginRecord
+from collective.login_logger import Session, logger
+from collective.login_logger.models import User, LoginRecord
 from datetime import datetime
 from sqlalchemy import and_
 from zope.component import getSiteManager

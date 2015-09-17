@@ -3,14 +3,14 @@
       xmlns:metal="http://xml.zope.org/namespaces/metal"
       xmlns:i18n="http://xml.zope.org/namespaces/i18n"
       metal:use-macro="context/prefs_main_template/macros/master"
-      i18n:domain="collective.login_monitor">
+      i18n:domain="collective.login_logger">
         
 <body>
     
     <metal:main fill-slot="prefs_configlet_main">
     <tal:main-macro metal:define-macro="controlpanel">
                                     
-     <div id="users-login-monitor" tal:define="can_use_contact_form view/can_use_contact_form">
+     <div id="users-login-logger" tal:define="can_use_contact_form view/can_use_contact_form">
          
      <a href=""
        id="setup-link"
@@ -20,14 +20,14 @@
         Site Setup
      </a> &rsaquo;
         
-     <h1 class="documentFirstHeading" i18n:translate="">Users login monitor</h1>
+     <h1 class="documentFirstHeading" i18n:translate="">Users login logger</h1>
      
      <p class="documentDescription" i18n:translate="form_help">
-         Search and monitor login operation taken by site users.
+         Search and logger login operation taken by site users.
      </p>
      
-     <form id="login-logger-form" class="enableFormTabbing visualNoPrint" action="users-login-monitor" method="post"
-           tal:attributes="action string:${context/absolute_url}/@@users-login-monitor">
+     <form id="login-logger-form" class="enableFormTabbing visualNoPrint" action="users-login-logger" method="post"
+           tal:attributes="action string:${context/absolute_url}/@@users-login-logger">
         <fieldset id="search_fieldset">
             <legend i18n:translate="search_legend" id="search_legend">Search/export logins</legend>
             <input type="hidden" name="search" value="1" />

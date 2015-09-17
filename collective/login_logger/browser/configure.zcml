@@ -1,25 +1,25 @@
 <configure
     xmlns="http://namespaces.zope.org/zope"
     xmlns:browser="http://namespaces.zope.org/browser"
-    i18n_domain="collective.login_monitor">
+    i18n_domain="collective.login_logger">
 
     <include package="plone.app.contentmenu" />
 
     <browser:page
-         name="users-login-monitor"
+         name="users-login-logger"
          for="Products.CMFCore.interfaces.ISiteRoot"
-         class=".view.UsersLoginMonitorView"
+         class=".view.UsersLoginLoggerView"
 	     template="search.pt"
-         permission="collective.login_monitor.MonitorUserPermission"
-         layer="..interfaces.ILoginMinitorLayer"
+         permission="collective.login_logger.LoggerUserPermission"
+         layer="..interfaces.ILoginLoggerLayer"
          />
 
     <browser:page
         for="Products.CMFCore.interfaces.ISiteRoot"
         name="login-logger-macros"
         template="login_logger_macros.pt"
-        permission="collective.login_monitor.MonitorUserPermission"
-        layer="..interfaces.ILoginMinitorLayer"
+        permission="collective.login_logger.LoggerUserPermission"
+        layer="..interfaces.ILoginLoggerLayer"
 		/>
             
     <!--browser:page

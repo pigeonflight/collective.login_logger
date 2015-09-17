@@ -4,7 +4,7 @@ from sqlalchemy import schema, types
 from sqlalchemy import Table
 from sqlalchemy import PrimaryKeyConstraint
 from sqlalchemy import ForeignKeyConstraint
-from collective.login_monitor import ORMBase
+from collective.login_logger import ORMBase
 
 
 metadata = ORMBase.metadata

@@ -5,9 +5,9 @@ from AccessControl import Unauthorized
 from AccessControl import getSecurityManager
 from Products.CMFCore.utils import getToolByName
 from Products.Five.browser import BrowserView
-from collective.login_monitor import Session
-from collective.login_monitor import messageFactory as _
-from collective.login_monitor.models import LoginRecord
+from collective.login_logger import Session
+from collective.login_logger import messageFactory as _
+from collective.login_logger.models import LoginRecord
 from datetime import date, datetime, timedelta
 from plone import api
 from plone.memoize.view import memoize
@@ -17,11 +17,11 @@ from zope.component import getMultiAdapter
 from zope.component.interfaces import ComponentLookupError
 
 
-class UsersLoginMonitorView(BrowserView):
+class UsersLoginLoggerView(BrowserView):
     
     ignored_groups = ('Administrators', 'Reviewers', 'AuthenticatedUsers', 'Site Administrators')
     try:
-        group_whitelist = api.portal.get_registry_record('collective.login_monitor.group_whitelist')
+        group_whitelist = api.portal.get_registry_record('collective.login_logger.group_whitelist')
     except ComponentLookupError:
         group_whitelist = False
         
@@ -85,13 +85,13 @@ class UsersLoginMonitorView(BrowserView):
     @memoize
     def can_use_contact_form(self):
         sm = getSecurityManager()
-        return sm.checkPermission('collective.login_monitor: contact users', self.context)
+        return sm.checkPermission('collective.login_logger: contact users', self.context)
 
     def _exportCSV(self):
         """Write a CSV output"""
         translate = lambda text: translation_service.utranslate(
             msgid=text,
-            domain="collective.login_monitor",
+            domain="collective.login_logger",
             context=context)
 
         context = self.context

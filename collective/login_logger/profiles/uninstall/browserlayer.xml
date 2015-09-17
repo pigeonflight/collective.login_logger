@@ -1,0 +1,5 @@
+<layers>
+    <layer name="collective.login_logger"
+           interface="collective.login_logger.interfaces.ILoginLoggerLayer"
+		   remove="True" />
+</layers>

@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2015-02-26 12:05+0000\n"
+"POT-Creation-Date: 2015-09-17 01:46+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI +ZONE\n"
 "Last-Translator: Luca Fabbri <keul@redturtle.it>\n"
 "Language-Team: RedTurtle Technology <sviluppoplone@redturtle.it>\n"
@@ -12,7 +12,7 @@ msgstr ""
 "Language-Code: it\n"
 "Language-Name: Italian\n"
 "Preferred-Encodings: utf-8 latin1\n"
-"Domain: collective.login_monitor\n"
+"Domain: collective.login_logger\n"
 
 #: ../browser/search.pt:103
 msgid "All the groups"
@@ -50,7 +50,11 @@ msgstr "Ultimo login"
 msgid "Last login in the search range"
 msgstr "Ultimo login nel periodo cercato"
 
-#. Default: "collective.login_monitor"
+#: ../profiles/default/controlpanel.xml
+msgid "Logger user logins"
+msgstr "Logger login utenti"
+
+#. Default: "collective.login_logger"
 #: ../browser/login_logger_macros.pt:11
 msgid "Login count"
 msgstr "Conteggio login"
@@ -58,10 +62,6 @@ msgstr "Conteggio login"
 #: ../browser/search.pt:124
 msgid "Message text"
 msgstr "Testo del messaggio"
-
-#: ../profiles/default/controlpanel.xml
-msgid "Monitor user logins"
-msgstr "Monitor login utenti"
 
 #: ../browser/search.pt:58
 msgid "Period"
@@ -75,21 +75,21 @@ msgstr "Cerca"
 msgid "Send message"
 msgstr "Invia messaggio"
 
-msgid "Store and monitor login access to your site"
+msgid "Store and logger login access to your site"
 msgstr "Memorizza e controlla i login degli utenti al sito"
 
 #: ../browser/search.pt:119
 msgid "Subject"
 msgstr "Oggetto"
 
-#. Default: "collective.login_monitor"
+#. Default: "collective.login_logger"
 #: ../browser/login_logger_macros.pt:8
 msgid "User ID"
 msgstr "ID utente"
 
 #: ../browser/search.pt:23
-msgid "Users login monitor"
-msgstr "Monitor login utenti"
+msgid "Users login logger"
+msgstr "Logger login utenti"
 
 #. Default: "Could not connect to the database engine. Please check your configuration"
 #: ../browser/view.py:280
@@ -108,7 +108,7 @@ msgstr ""
 "Escludi elementi trovati dai criteri di ricerca.\n"
 "Questo significa che saranno mostrati utenti che non hanno effettuato un login nel periodo selezionato."
 
-#. Default: "Search and monitor login operation taken by site users."
+#. Default: "Search and logger login operation taken by site users."
 #: ../browser/search.pt:25
 msgid "form_help"
 msgstr "Cerca e controlla le operazioni di login intraprese dagli utenti del sito."
