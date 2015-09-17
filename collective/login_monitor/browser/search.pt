@@ -43,6 +43,14 @@
                 
                     $("#start").datepicker({showOn: 'button', buttonImage: 'popup_calendar.png', buttonImageOnly: true, onSelect: updateDate, dateFormat: 'dd/mm/yy' });
                     $("#end").datepicker({showOn: 'button', buttonImage: 'popup_calendar.png', buttonImageOnly: true, onSelect: updateDate, dateFormat: 'dd/mm/yy'});
+                    // $("#datefilter").click(function(){$("#thisholder").show()});
+                    $("#datefilter").click(function() { 
+                        if ($("#datefilter").attr('checked')) {return $("#thisholder").show();
+                          } else {
+                            return $("#thisholder").hide();
+                              }});
+
+
 
                 });
             })(jQuery);
@@ -55,7 +63,13 @@
 				       tal:attributes="value request/user_id|nothing" />
             </div>
             <div class="field">
-                <label for="start" i18n:translate="">Period</label>
+                <input type="checkbox" id="datefilter" name="datefilter" value="datefilter"
+				       tal:attributes="checked python:request.get('datefilter')=='datefilter'" />
+                <label for="datefilter" i18n:translate="">Filter by Date</label>
+                
+                
+                <!--<label for="start" i18n:translate="">Period</label>-->
+                <div id="thisholder" style="display: none">
                 <div class="formHelp" i18n:translate="period_help">
                     Show accesses inside the following range 
                 </div>
@@ -84,6 +98,7 @@
                        size="10"
                        maxlength="10"
                        />
+            </div>
             </div>
             <div class="field">
                 <input type="checkbox" id="exclude" name="exclude" value="exclude"
