@@ -1,11 +1,11 @@
 from setuptools import setup, find_packages
 import os
 
-version = '0.4.1.dev0'
+version = '0.1'
 
-setup(name='collective.login_monitor',
+setup(name='collective.login_logger',
       version=version,
-      description="Store and monitor login access to your Plone site",
+      description="Log login access to your Plone site",
       long_description=open("README.rst").read() + "\n" +
                        open(os.path.join("docs", "HISTORY.rst")).read(),
       # Get more strings from
@@ -18,10 +18,10 @@ setup(name='collective.login_monitor',
         "Framework :: Plone :: 4.3",
         "Programming Language :: Python",
         ],
-      keywords='plone plonegov login user access monitor',
-      author='RedTurtle Technology',
+      keywords='plone plonegov login user access logger',
+      author='Alteroo',
       author_email='sviluppoplone@redturtle.it',
-      url='http://plone.org/products/collective.login_monitor',
+      url='http://plone.org/products/collective.login_logger',
       license='GPL',
       packages=find_packages(exclude=['ez_setup']),
       namespace_packages=['collective'],

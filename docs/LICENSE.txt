@@ -1,3 +1,5 @@
+  collective.login_logger is a fork of collective.login_monitor 
+
   collective.login_monitor is copyright RedTurtle Technology
 
   This program is free software; you can redistribute it and/or modify

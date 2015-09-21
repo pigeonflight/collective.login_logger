@@ -5,9 +5,9 @@ from AccessControl import Unauthorized
 from AccessControl import getSecurityManager
 from Products.CMFCore.utils import getToolByName
 from Products.Five.browser import BrowserView
-from collective.login_monitor import Session
-from collective.login_monitor import messageFactory as _
-from collective.login_monitor.models import LoginRecord
+from collective.login_logger import Session
+from collective.login_logger import messageFactory as _
+from collective.login_logger.models import LoginRecord
 from datetime import date, datetime, timedelta
 from plone import api
 from plone.memoize.view import memoize
@@ -17,12 +17,14 @@ from zope.component import getMultiAdapter
 from zope.component.interfaces import ComponentLookupError
 
 
-class UsersLoginMonitorView(BrowserView):
+class UsersLoginLoggerView(BrowserView):
     
     ignored_groups = ('Administrators', 'Reviewers', 'AuthenticatedUsers', 'Site Administrators')
-    group_whitelist = api.portal.get_registry_record(
-               'collective.login_monitor.group_whitelist')
-    
+    try:
+        group_whitelist = api.portal.get_registry_record('collective.login_logger.group_whitelist')
+    except ComponentLookupError:
+        group_whitelist = False
+        
     def __init__(self, context, request):
         self.context = context
         self.request = request
@@ -31,6 +33,7 @@ class UsersLoginMonitorView(BrowserView):
         self.last_query_size = 0
 
     def __call__(self, *args, **kwargs):
+        # import pdb;pdb.set_trace()
         self._form = kwargs or self.request.form
         if self._form.get('export'):
             self._exportCSV()
@@ -83,13 +86,13 @@ class UsersLoginMonitorView(BrowserView):
     @memoize
     def can_use_contact_form(self):
         sm = getSecurityManager()
-        return sm.checkPermission('collective.login_monitor: contact users', self.context)
+        return sm.checkPermission('collective.login_logger: contact users', self.context)
 
     def _exportCSV(self):
         """Write a CSV output"""
         translate = lambda text: translation_service.utranslate(
             msgid=text,
-            domain="collective.login_monitor",
+            domain="collective.login_logger",
             context=context)
 
         context = self.context
@@ -167,10 +170,10 @@ class UsersLoginMonitorView(BrowserView):
         ('Member',), (), ('Test 1',),) for x in range(4)]
         '''
         pas = getToolByName(self.context, 'acl_users')
-        for group in self.groups:
-            if group['id'] in self.group_whitelist:
-                yield group
-            
+        if group_whitelist:
+            for group in self.groups:
+                if group['id'] in self.group_whitelist:
+                    yield group
 
     def _load_exclude_users(self, site_id):
         """Load user ids from login in the range. Used for performing negative logic"""
@@ -185,88 +188,64 @@ class UsersLoginMonitorView(BrowserView):
 
     def _get_results(self, results):
         acl_users = getToolByName(self.context, 'acl_users')
-        self.last_query_size = len(results)
+        #self.last_query_size = len(results)
+        self.last_query_size = 1  # hardcoded. using session.execute returns a resultproxy object which has no len
+        
 
         processed = []
         for row in results:
-            result = {'user_id': row.user_id,
+            result = {'user_id': row[0],
                       'login_count': row[1],
                       'user_fullname': None,
                       'user_email': None,
                       'last_login_date': row[2]}
             # unluckily searchUsers is not returnig the email address
             #user = acl_users.searchUsers(login=row.user_id, exact_match=True)
-            user = acl_users.getUserById(row.user_id)
+            
+            user = acl_users.getUserById(row[0])
+            
             if user:
                 result['user_fullname'] = user.getProperty('fullname')
                 result['user_email'] = user.getProperty('email')
             processed.append(result)
         return processed
 
-    def _query_users(self, query, site_id):
+    def _sole_query(self, site_id):
         exclude_ids = self._load_exclude_users(site_id)
-        if not exclude_ids:
-            results = Session.query(LoginRecord.user_id, func.count(LoginRecord.user_id),
-                                    func.max(LoginRecord.timestamp)) \
-                    .filter(and_(LoginRecord.user_id.startswith(query),
-                                 LoginRecord.plone_site_id==site_id,
-                                 LoginRecord.timestamp>=self._start,
-                                 LoginRecord.timestamp<=self._end)) \
-                    .group_by(LoginRecord.user_id,
-                              LoginRecord.plone_site_id).order_by(LoginRecord.user_id).all()
-        else:
-            results = Session.query(LoginRecord.user_id, func.count(LoginRecord.user_id),
-                                    func.max(LoginRecord.timestamp)) \
-                    .filter(and_(LoginRecord.user_id.startswith(query),
-                                 LoginRecord.plone_site_id==site_id,
-                                 not_(LoginRecord.user_id.in_(exclude_ids)))) \
-                    .group_by(LoginRecord.user_id,
-                              LoginRecord.plone_site_id).order_by(LoginRecord.user_id).all()
+        datefilter = self._form.get('datefilter', '')
+        user_id = self._form.get('user_id', '')
+        group_id = self._form.get('group_id', '')
+        qtext = 'select user_id,count(user_id),max(timestamp)  from logins_registry '
+        qvars = {}
+        
+        if user_id:
+            qtext += ' where user_id like :user_id '
+            qvars['user_id'] = '%'+user_id+'%'
+        
+        if datefilter:
+            if 'where' in qtext:
+                qtext += ' and timestamp > :lodate and timestamp < :hidate '
+            else:
+                qtext += ' where timestamp > :lodate and timestamp < :hidate '
+            
+            qvars['lodate'] = self._start
+            qvars['hidate'] = self._end
+            
+        if group_id:
+            if 'where' in qtext:
+                qtext += ' and group_id like :group_id '
+            else:
+                qtext += ' where group_id like :group_id '
+            qvars['group_id'] = '%|'+group_id + '|%'
+        
+        qtext += ' group by user_id; '
+        
+        print qtext
+        results = Session.execute(qtext,qvars)
+              
         return self._get_results(results)
-
-    def _load_users(self, user_ids, site_id):
-        """Load data from all users in the set (commonly taken from groups member ids)"""
-        exclude_ids = self._load_exclude_users(site_id)
-        if not exclude_ids:
-            results = Session.query(LoginRecord.user_id, func.count(LoginRecord.user_id),
-                                    func.max(LoginRecord.timestamp)) \
-                    .filter(and_(LoginRecord.user_id.in_(user_ids),
-                                 LoginRecord.plone_site_id==site_id,
-                                 LoginRecord.timestamp>=self._start,
-                                 LoginRecord.timestamp<=self._end)) \
-                    .group_by(LoginRecord.user_id,
-                              LoginRecord.plone_site_id).order_by(LoginRecord.user_id).all()
-        else:
-            results = Session.query(LoginRecord.user_id, func.count(LoginRecord.user_id),
-                                    func.max(LoginRecord.timestamp)) \
-                    .filter(and_(LoginRecord.user_id.in_(user_ids),
-                                 LoginRecord.plone_site_id==site_id,
-                                 not_(LoginRecord.user_id.in_(exclude_ids)))
-                                 ) \
-                    .group_by(LoginRecord.user_id,
-                              LoginRecord.plone_site_id).order_by(LoginRecord.user_id).all()
-            import pdb;pdb.set_trace()
-        return self._get_results(results)
-
-    def _all_users(self, site_id):
-        exclude_ids = self._load_exclude_users(site_id)
-        if not exclude_ids:
-            results = Session.query(LoginRecord.user_id, func.count(LoginRecord.user_id),
-                                    func.max(LoginRecord.timestamp)) \
-                    .filter(LoginRecord.plone_site_id==site_id,
-                            LoginRecord.timestamp>=self._start,
-                            LoginRecord.timestamp<=self._end) \
-                    .group_by(LoginRecord.user_id,
-                              LoginRecord.plone_site_id).order_by(LoginRecord.user_id).all()
-        else:
-            results = Session.query(LoginRecord.user_id, func.count(LoginRecord.user_id),
-                                    func.max(LoginRecord.timestamp)) \
-                    .filter(LoginRecord.plone_site_id==site_id,
-                            not_(LoginRecord.user_id.in_(exclude_ids))) \
-                    .group_by(LoginRecord.user_id,
-                              LoginRecord.plone_site_id).order_by(LoginRecord.user_id).all()            
-        return self._get_results(results)
-
+    
+    
     def _prepare_interval(self):
         # we don't have strptime on Python 2.4
         sy,sm,sd = self._form.get('start_date').split('-')
@@ -278,21 +257,10 @@ class UsersLoginMonitorView(BrowserView):
         """Search results"""
         self._prepare_interval()
         portal = getToolByName(self.context, 'portal_url').getPortalObject()
-        user_id = self._form.get('user_id', '')
+        
         try:
-            if user_id:
-                return self._query_users(user_id, portal.getId())
-            group_id = self._form.get('group_id', '')
-            if group_id:
-                pas = getToolByName(self.context, 'acl_users')
-                group = pas.getGroupById(group_id)
-                if not group:
-                    group_users = []
-                else:
-                    group_users = group.getGroupMemberIds()
-                return self._load_users(group_users, portal.getId())
-            # no filter; let's load ALL users
-            return self._all_users(portal.getId())
+           return self._sole_query(portal.getId())
+           
         except ComponentLookupError:
             self.request.response.redirect("%s/%s" % (portal.absolute_url(), self.__name__))
             portal.plone_utils.addPortalMessage(_('component_lookup_error',

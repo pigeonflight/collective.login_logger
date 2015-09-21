@@ -4,7 +4,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2015-02-26 12:05+0000\n"
+"POT-Creation-Date: 2015-09-17 01:46+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI +ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -15,7 +15,7 @@ msgstr ""
 "Language-Code: en\n"
 "Language-Name: English\n"
 "Preferred-Encodings: utf-8 latin1\n"
-"Domain: collective.login_monitor\n"
+"Domain: collective.login_logger\n"
 
 #: ../browser/search.pt:103
 msgid "All the groups"
@@ -53,16 +53,16 @@ msgstr ""
 msgid "Last login in the search range"
 msgstr ""
 
+#: ../profiles/default/controlpanel.xml
+msgid "Logger user logins"
+msgstr ""
+
 #: ../browser/login_logger_macros.pt:11
 msgid "Login count"
 msgstr ""
 
 #: ../browser/search.pt:124
 msgid "Message text"
-msgstr ""
-
-#: ../profiles/default/controlpanel.xml
-msgid "Monitor user logins"
 msgstr ""
 
 #: ../browser/search.pt:58
@@ -77,7 +77,7 @@ msgstr ""
 msgid "Send message"
 msgstr ""
 
-msgid "Store and monitor login access to your site"
+msgid "Store and logger login access to your site"
 msgstr ""
 
 #: ../browser/search.pt:119
@@ -89,7 +89,7 @@ msgid "User ID"
 msgstr ""
 
 #: ../browser/search.pt:23
-msgid "Users login monitor"
+msgid "Users login logger"
 msgstr ""
 
 #. Default: "Could not connect to the database engine. Please check your configuration"
@@ -107,7 +107,7 @@ msgstr ""
 msgid "exclude_help"
 msgstr ""
 
-#. Default: "Search and monitor login operation taken by site users."
+#. Default: "Search and logger login operation taken by site users."
 #: ../browser/search.pt:25
 msgid "form_help"
 msgstr ""

@@ -3,18 +3,18 @@
     xmlns:five="http://namespaces.zope.org/five"
     xmlns:i18n="http://namespaces.zope.org/i18n"
     xmlns:genericsetup="http://namespaces.zope.org/genericsetup"
-    i18n_domain="collective.login_monitor">
+    i18n_domain="collective.login_logger">
 
    <five:registerPackage package="." />
    <i18n:registerTranslations directory="locales" />
 
    <permission
-      id="collective.login_monitor.MonitorUserPermission"
-      title="collective.login_monitor: View logins"
+      id="collective.login_logger.LoggerUserPermission"
+      title="collective.login_logger: View logins"
       />
    <permission
-      id="collective.login_monitor.ContactUserPermission"
-      title="collective.login_monitor: contact users"
+      id="collective.login_logger.ContactUserPermission"
+      title="collective.login_logger: contact users"
       />
 
    <subscriber
@@ -27,16 +27,16 @@
 
   <genericsetup:registerProfile
       name="default"
-      title="collective.login_monitor"
+      title="collective.login_logger"
       directory="profiles/default"
-      description="Store and monitor login access to your site"
+      description="Store and logger login access to your site"
       provides="Products.GenericSetup.interfaces.EXTENSION"
       />
   <genericsetup:registerProfile
       name="uninstall"
-      title="collective.login_monitor: uninstall"
+      title="collective.login_logger: uninstall"
       directory="profiles/uninstall"
-      description="Remove collective.login_monitor"
+      description="Remove collective.login_logger"
       provides="Products.GenericSetup.interfaces.EXTENSION"
   />
   <genericsetup:upgradeStep
@@ -44,7 +44,7 @@
       destination="1100"
       title="Update control panel action icon"
       description="Updates URL for action icon in control panel."
-      profile="collective.login_monitor:default"
+      profile="collective.login_logger:default"
       handler=".upgrades.upgrade_1000_to_1100"
       />
   <genericsetup:upgradeStep
@@ -52,7 +52,7 @@
       destination="1200"
       title="Update permissions"
       description="Updates new permission settings"
-      profile="collective.login_monitor:default"
+      profile="collective.login_logger:default"
       handler=".upgrades.upgrade_to_1200"
       />
 

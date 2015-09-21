@@ -1,6 +1,6 @@
 #!/bin/sh
 
-DOMAIN='collective.login_monitor'
+DOMAIN='collective.login_logger'
 
 i18ndude rebuild-pot --pot ${DOMAIN}.pot --create ${DOMAIN} ..
 i18ndude merge --pot ${DOMAIN}.pot --merge ${DOMAIN}-manual.pot

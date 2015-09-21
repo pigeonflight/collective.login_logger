@@ -3,14 +3,14 @@
       xmlns:metal="http://xml.zope.org/namespaces/metal"
       xmlns:i18n="http://xml.zope.org/namespaces/i18n"
       metal:use-macro="context/prefs_main_template/macros/master"
-      i18n:domain="collective.login_monitor">
+      i18n:domain="collective.login_logger">
         
 <body>
     
     <metal:main fill-slot="prefs_configlet_main">
     <tal:main-macro metal:define-macro="controlpanel">
                                     
-     <div id="users-login-monitor" tal:define="can_use_contact_form view/can_use_contact_form">
+     <div id="users-login-logger" tal:define="can_use_contact_form view/can_use_contact_form">
          
      <a href=""
        id="setup-link"
@@ -20,14 +20,14 @@
         Site Setup
      </a> &rsaquo;
         
-     <h1 class="documentFirstHeading" i18n:translate="">Users login monitor</h1>
+     <h1 class="documentFirstHeading" i18n:translate="">Users login logger</h1>
      
      <p class="documentDescription" i18n:translate="form_help">
-         Search and monitor login operation taken by site users.
+         Search and logger login operation taken by site users.
      </p>
      
-     <form id="login-logger-form" class="enableFormTabbing visualNoPrint" action="users-login-monitor" method="post"
-           tal:attributes="action string:${context/absolute_url}/@@users-login-monitor">
+     <form id="login-logger-form" class="enableFormTabbing visualNoPrint" action="users-login-logger" method="post"
+           tal:attributes="action string:${context/absolute_url}/@@users-login-logger">
         <fieldset id="search_fieldset">
             <legend i18n:translate="search_legend" id="search_legend">Search/export logins</legend>
             <input type="hidden" name="search" value="1" />
@@ -43,6 +43,14 @@
                 
                     $("#start").datepicker({showOn: 'button', buttonImage: 'popup_calendar.png', buttonImageOnly: true, onSelect: updateDate, dateFormat: 'dd/mm/yy' });
                     $("#end").datepicker({showOn: 'button', buttonImage: 'popup_calendar.png', buttonImageOnly: true, onSelect: updateDate, dateFormat: 'dd/mm/yy'});
+                    
+                    $("#datefilter").click(function() { 
+                        if ($("#datefilter").attr('checked')) {return $("#thisholder").show();
+                          } else {
+                            return $("#thisholder").hide();
+                              }});
+
+
 
                 });
             })(jQuery);
@@ -55,7 +63,13 @@
 				       tal:attributes="value request/user_id|nothing" />
             </div>
             <div class="field">
-                <label for="start" i18n:translate="">Period</label>
+                <input type="checkbox" id="datefilter" name="datefilter" value="datefilter"
+				       tal:attributes="checked python:request.get('datefilter')=='datefilter'" />
+                <label for="datefilter" i18n:translate="">Filter by Date</label>
+                
+                
+                <!--<label for="start" i18n:translate="">Period</label>-->
+                <div id="thisholder" style="display: none">
                 <div class="formHelp" i18n:translate="period_help">
                     Show accesses inside the following range 
                 </div>
@@ -85,7 +99,8 @@
                        maxlength="10"
                        />
             </div>
-            <div class="field">
+            </div>
+            <div class="field" style="display:none">
                 <input type="checkbox" id="exclude" name="exclude" value="exclude"
 				       tal:attributes="checked python:request.get('exclude')=='exclude'" />
                 <label for="exclude" i18n:translate="">Exclude</label>

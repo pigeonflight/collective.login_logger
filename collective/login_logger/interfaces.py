@@ -2,10 +2,10 @@
 
 from zope.interface import Interface
 from zope import schema
-from collective.login_monitor import messageFactory as _
+from collective.login_logger import messageFactory as _
 
-class ILoginMinitorLayer(Interface):
-    """collective.login_monitor product layer"""
+class ILoginLoggerLayer(Interface):
+    """collective.login_logger product layer"""
 
 class IRegistry(Interface):
     group_white_list = schema.List(

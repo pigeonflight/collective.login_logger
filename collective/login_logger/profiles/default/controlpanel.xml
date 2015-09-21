@@ -1,27 +1,27 @@
 <?xml version="1.0"?>
 <object name="portal_controlpanel"
         xmlns:i18n="http://xml.zope.org/namespaces/i18n"
-        i18n:domain="collective.login_monitor">
+        i18n:domain="collective.login_logger">
 
     <configlet
-        title="Monitor user logins"
+        title="Logger user logins"
         action_id="users-login-search"
-        appId="collective.login_monitor"
+        appId="collective.login_logger"
         category="Products"
         condition_expr=""
         icon_expr="string:${portal_url}/group.png"
-        url_expr="string:${portal_url}/@@users-login-monitor"
+        url_expr="string:${portal_url}/@@users-login-logger"
         visible="True"
         i18n:attributes="title">
-            <permission>collective.login_monitor: View logins</permission>
+            <permission>collective.login_logger: View logins</permission>
     </configlet>
     <configlet
-        title="Login Monitor Settings"
-        action_id="login_monitor.settings"
-        appId="collective.login_monitor_settings"
+        title="Login Logger Settings"
+        action_id="login_logger.settings"
+        appId="collective.login_logger_settings"
         category="Products"
         condition_expr=""
-        url_expr="string:${portal_url}/portal_registry?q=&amp;qp=prefix%3Acollective.login_monitor.interfaces.IRegistry"
+        url_expr="string:${portal_url}/portal_registry?q=&amp;qp=prefix%3Acollective.login_logger.interfaces.IRegistry"
         visible="True"
         i18n:attributes="title">
             <permission>Manage portal</permission>

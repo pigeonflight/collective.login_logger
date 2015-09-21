@@ -1,5 +1,7 @@
-Save any **login operation** done in your Plone site to an external database and provide a Plone interface
-for query the database.
+This is a fork of collective.login_monitor. It adds reliable postgresql support (we could only get sqlite 
+working with it). We don't promise compatibility between collective.login_logger and collective.login_monitor.
+We Save any **login operation** done in your Plone site to an external database and provide a Plone interface
+to query the database.
 
 .. contents:: **Table of contents**
 
@@ -22,12 +24,12 @@ After the installation, any login done in your Plone will save to an external da
 * user id
 * a timestamp
 
-Then a new configuration panel can bhe found in the site configuration: "*Monitor user logins*".
+Then a new configuration panel can bhe found in the site configuration: "*Log user logins*".
 
 From this view you can query the database previously populated:
 
-.. image:: http://blog.redturtle.it/pypi-images/collective.login_monitor/collective.login_monitor-0.2-01.png 
-   :alt: Control panel for login monitor
+.. image:: http://blog.redturtle.it/pypi-images/collective.login_logger/collective.login_logger-0.2-01.png 
+   :alt: Control panel for login logger
 
 You must limit the search inside a rande of dates, and optionally limiting users to members of a group.
 Results of the table displayed can be export to a CSV file.
@@ -47,7 +49,7 @@ Follow an example based on `sqlite`__ (**not advised for production environment*
 
 __ http://www.sqlite.org/
 
-Add ``collective.login_monitor`` to your buildout, then provide a SQLAlchemy connection string::
+Add ``collective.login_logger`` to your buildout, then provide a SQLAlchemy connection string::
 
     [buildout]
     ...
@@ -56,7 +58,7 @@ Add ``collective.login_monitor`` to your buildout, then provide a SQLAlchemy con
     ...
     eggs=
        ...
-       collective.login_monitor
+       collective.login_logger
     
     zcml-additional =
         ...
@@ -65,7 +67,7 @@ Add ``collective.login_monitor`` to your buildout, then provide a SQLAlchemy con
            <include package="z3c.saconfig" file="meta.zcml" />
            <db:engine name="plone_logins"
                       url="sqlite:///${buildout:directory}/var/filestorage/plone_logins.db"
-                      setup="collective.login_monitor.prepare_model.prepare"
+                      setup="collective.login_logger.prepare_model.prepare"
                       />
            <db:session name="plone_logins" engine="plone_logins" />
        </configure>

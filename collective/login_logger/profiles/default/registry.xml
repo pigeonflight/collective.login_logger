@@ -6,6 +6,6 @@
       <value key="css">True</value>
       <value key="patch">True</value>
     </records>
-    <records interface="collective.login_monitor.interfaces.IRegistry" 
-    prefix="login_monitor" />
+    <records interface="collective.login_logger.interfaces.IRegistry" 
+    prefix="login_logger" />
 </registry>
