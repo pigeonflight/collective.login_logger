@@ -75,7 +75,7 @@ Add ``collective.login_logger`` to your buildout, then provide a SQLAlchemy conn
 Credits
 =======
 
-Developed with the support of:
+Originallly Developed by RedTurtle with the support of:
 
 * `Azienda USL Ferrara`__
   
